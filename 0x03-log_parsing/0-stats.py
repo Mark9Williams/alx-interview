@@ -1,15 +1,16 @@
 #!/usr/bin/python3
-""" a script that reads stdin line by line and computes metrics"""
+""" A script that reads stdin line by line and computes metrics """
 
-import sys
 import signal
+import sys
 import re
 
 status_codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
 file_total_size = 0
 line_count = 0
 log_format = re.compile(
-    r'^\S+ - \[\S+\] "GET /projects/260 HTTP/1.1" (\d{3}) (\d+)$')
+    r'^\S+ - \[\S+\] "GET /projects/260 HTTP/1.1" (\d{3}) (\d+)$'
+)
 
 
 def print_statistics():
@@ -21,28 +22,32 @@ def print_statistics():
 
 
 def handle_interruption(signal, frame):
-    """hadles the interruption signal (ctrl + c)"""
+    """Handles the interruption signal (CTRL + C)"""
     print_statistics()
     sys.exit(0)
 
 
+# Set signal handler
 signal.signal(signal.SIGINT, handle_interruption)
 
 try:
     for line in sys.stdin:
-        match = log_format.match(line)
+        # Strip whitespace from the line
+        match = log_format.match(line.strip())
         if match:
             status_code = int(match.group(1))
             file_size = int(match.group(2))
 
             file_total_size += file_size
             if status_code in status_codes:
-                status_codes[status_code] += 1 
+                status_codes[status_code] += 1
 
             line_count += 1
-            if line % 10 == 0:
+            if line_count % 10 == 0:  # Use line_count here
                 print_statistics()
 
 except Exception as e:
     print(f"Exception: {e}", file=sys.stderr)
+
+# Print final statistics
 print_statistics()
