@@ -9,7 +9,7 @@ status_codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
 file_total_size = 0
 line_count = 0
 log_format = re.compile(
-    r'^\S+ - \[\S+\] "GET /projects/260 HTTP/1.1" (\d{3}) (\d+)$'
+    r'^\S+ - \[(.*?)\] "GET /projects/260 HTTP/1.1" (\d{3}) (\d+)$'
 )
 
 
@@ -35,8 +35,8 @@ try:
         # Strip whitespace from the line
         match = log_format.match(line.strip())
         if match:
-            status_code = int(match.group(1))
-            file_size = int(match.group(2))
+            status_code = int(match.group(2))
+            file_size = int(match.group(3))
 
             file_total_size += file_size
             if status_code in status_codes:
